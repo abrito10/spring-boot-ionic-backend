@@ -1,6 +1,5 @@
 package com.abrito10.cursomc;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import com.abrito10.cursomc.dao.CategoriaDAO;
 import com.abrito10.cursomc.dao.ProdutoDAO;
 import com.abrito10.cursomc.domain.Categoria;
 import com.abrito10.cursomc.domain.Produto;
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 @SpringBootApplication
 public class CursomcApplication  implements CommandLineRunner{
