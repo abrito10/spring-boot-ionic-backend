@@ -8,8 +8,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.abrito10.cursomc.dao.CategoriaDAO;
+import com.abrito10.cursomc.dao.CidadeDAO;
+import com.abrito10.cursomc.dao.EstadoDAO;
 import com.abrito10.cursomc.dao.ProdutoDAO;
 import com.abrito10.cursomc.domain.Categoria;
+import com.abrito10.cursomc.domain.Cidade;
+import com.abrito10.cursomc.domain.Estado;
 import com.abrito10.cursomc.domain.Produto;
 
 @SpringBootApplication
@@ -20,6 +24,12 @@ public class CursomcApplication  implements CommandLineRunner{
 	
 	@Autowired
 	private ProdutoDAO produtoDao;
+	
+	@Autowired
+	private EstadoDAO estadoDao;
+	
+	@Autowired
+	private CidadeDAO cidadeDao;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -45,6 +55,19 @@ public class CursomcApplication  implements CommandLineRunner{
 		
 		categoriaDao.saveAll(Arrays.asList(cat1,cat2));
 		produtoDao.saveAll(Arrays.asList(p1,p2,p3));
+		
+		Estado est1 = new Estado(null, "Minas Gerais");
+		Estado est2 = new Estado(null, "Sao Paulo");
+		
+		Cidade c1 = new Cidade(null, "Uberlandia", est1);
+		Cidade c2 = new Cidade(null, "Sao Paulo", est2);
+		Cidade c3 = new Cidade(null, "Campinas", est2);
+		
+		est1.getCidades().addAll(Arrays.asList(c1));
+		est2.getCidades().addAll(Arrays.asList(c2,c3));
+		
+		estadoDao.saveAll(Arrays.asList(est1,est2));
+		cidadeDao.saveAll(Arrays.asList(c1,c2,c3));
 		
 	}
 
