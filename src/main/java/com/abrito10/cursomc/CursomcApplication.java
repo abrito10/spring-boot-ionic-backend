@@ -1,5 +1,6 @@
 package com.abrito10.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.abrito10.cursomc.dao.CidadeDAO;
 import com.abrito10.cursomc.dao.ClienteDAO;
 import com.abrito10.cursomc.dao.EnderecoDAO;
 import com.abrito10.cursomc.dao.EstadoDAO;
+import com.abrito10.cursomc.dao.PagamentoDAO;
+import com.abrito10.cursomc.dao.PedidoDAO;
 import com.abrito10.cursomc.dao.ProdutoDAO;
 import com.abrito10.cursomc.domain.Categoria;
 import com.abrito10.cursomc.domain.Cidade;
 import com.abrito10.cursomc.domain.Cliente;
 import com.abrito10.cursomc.domain.Endereco;
 import com.abrito10.cursomc.domain.Estado;
+import com.abrito10.cursomc.domain.Pagamento;
+import com.abrito10.cursomc.domain.PagamentoComBoleto;
+import com.abrito10.cursomc.domain.PagamentoComCartao;
+import com.abrito10.cursomc.domain.Pedido;
 import com.abrito10.cursomc.domain.Produto;
+import com.abrito10.cursomc.domain.enums.EstadoPagamento;
 import com.abrito10.cursomc.domain.enums.TipoCliente;
 
 @SpringBootApplication
@@ -42,6 +50,13 @@ public class CursomcApplication  implements CommandLineRunner{
 	@Autowired
 	private EnderecoDAO enderecoDao;
 	
+	@Autowired
+	private PagamentoDAO pagamentoDao;
+	
+	@Autowired
+	private PedidoDAO pedidoDao;
+	
+
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
 	}
@@ -90,6 +105,23 @@ public class CursomcApplication  implements CommandLineRunner{
 		
 		clienteDao.saveAll(Arrays.asList(cli1));
 		enderecoDao.saveAll(Arrays.asList(e1,e2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("30/07/2017 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 10:32"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1,ped2));
+		
+		pedidoDao.saveAll(Arrays.asList(ped1,ped2));
+		pagamentoDao.saveAll(Arrays.asList(pagto1,pagto2));
+		
 		
 	}
 
