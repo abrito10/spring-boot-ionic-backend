@@ -28,7 +28,8 @@ public class Produto implements Serializable {
 	private String nome;
 	private double preco;
 	
-	@JsonBackReference
+	//@JsonBackReference
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "PRODUTO_CATEGORIA",
 		joinColumns = @JoinColumn(name = "produto_id"),
