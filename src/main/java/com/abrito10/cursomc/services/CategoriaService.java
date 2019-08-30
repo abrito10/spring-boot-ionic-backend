@@ -3,10 +3,12 @@ package com.abrito10.cursomc.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.abrito10.cursomc.dao.CategoriaDAO;
 import com.abrito10.cursomc.domain.Categoria;
+import com.abrito10.cursomc.services.exception.DataIntegrityException;
 import com.abrito10.cursomc.services.exception.ObjectNotFoundException;
 
 @Service
@@ -31,4 +33,13 @@ public class CategoriaService {
 		return repo.save(obj);
 	}
 	
+	public void delete(Integer id) {
+		find(id);
+		try {
+			repo.deleteById(id);			
+		}
+		catch(DataIntegrityViolationException e) {
+			throw new DataIntegrityException("Nao é possivel excluir uma categoriaque possui produtos");
+		}
+	}
 }
