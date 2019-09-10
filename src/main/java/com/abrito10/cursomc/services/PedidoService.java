@@ -1,33 +1,63 @@
 package com.abrito10.cursomc.services;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.abrito10.cursomc.dao.ItemPedidoDAO;
+import com.abrito10.cursomc.dao.PagamentoDAO;
 import com.abrito10.cursomc.dao.PedidoDAO;
+import com.abrito10.cursomc.domain.ItemPedido;
+import com.abrito10.cursomc.domain.PagamentoComBoleto;
 import com.abrito10.cursomc.domain.Pedido;
+import com.abrito10.cursomc.domain.enums.EstadoPagamento;
 import com.abrito10.cursomc.services.exception.ObjectNotFoundException;
 
 @Service
 public class PedidoService {
-	
+
 	@Autowired
 	private PedidoDAO repo;
-	
+
+	@Autowired
+	private PagamentoDAO pagamentoDao;
+
+	@Autowired
+	private ProdutoService produtoService;
+
+	@Autowired
+	private ItemPedidoDAO itemPedidoDao;
+
+	@Autowired
+	private BoletoService boletoService;
+
 	public Pedido find(Integer id) {
-		Optional<Pedido> obj = repo.findById(id); 
+		Optional<Pedido> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Pedido.class.getName()));
 	}
-}
-/*
+
 	@Transactional
-	public Cliente insert(Cliente obj) {
+	public Pedido insert(Pedido obj) {
 		obj.setId(null);
+		obj.setInstante(new Date());
+		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
+		obj.getPagamento().setPedido(obj);
+		if (obj.getPagamento() instanceof PagamentoComBoleto) {
+			PagamentoComBoleto pagto = (PagamentoComBoleto) obj.getPagamento();
+			boletoService.preencherPagamentoComBoleto(pagto, obj.getInstante());
+		}
 		obj = repo.save(obj);
-		enderecoRepository.saveAll(obj.getEnderecos());
+		pagamentoDao.save(obj.getPagamento());
+		for (ItemPedido ip : obj.getItens()) {
+			ip.setDesconto(0.0);
+			ip.setPreco(produtoService.find(ip.getProduto().getId()).getPreco());
+			ip.setPedido(obj);
+		}
+		itemPedidoDao.saveAll(obj.getItens());
 		return obj;
 	}
-
-*/
+}
