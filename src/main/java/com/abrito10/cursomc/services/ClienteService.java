@@ -17,9 +17,12 @@ import com.abrito10.cursomc.dao.EnderecoDAO;
 import com.abrito10.cursomc.domain.Cidade;
 import com.abrito10.cursomc.domain.Cliente;
 import com.abrito10.cursomc.domain.Endereco;
+import com.abrito10.cursomc.domain.enums.Perfil;
 import com.abrito10.cursomc.domain.enums.TipoCliente;
 import com.abrito10.cursomc.dto.ClienteDTO;
 import com.abrito10.cursomc.dto.ClienteNewDTO;
+import com.abrito10.cursomc.security.UserSS;
+import com.abrito10.cursomc.services.exception.AuthorizationException;
 import com.abrito10.cursomc.services.exception.DataIntegrityException;
 import com.abrito10.cursomc.services.exception.ObjectNotFoundException;
 
@@ -36,6 +39,10 @@ public class ClienteService {
 	private EnderecoDAO enderecoDao;
 	
 	public Cliente find(Integer id) {
+		UserSS user = UserService.authenticade();
+		if(user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso Negado!!!");
+		}
 		Optional<Cliente> obj = repo.findById(id); 
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
